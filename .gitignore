@@ -1,2 +1,4 @@
 data/*
 weibo-search/*
+.DS_Store
+data_cleaning.ipynb

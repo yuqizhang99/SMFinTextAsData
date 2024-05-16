@@ -38,28 +38,6 @@ def getMentionedUsers(users):
     else:
         return users.split(',')
 
-def preprocess(row,firm_name):
-    text = row['text']
-    for mentioned_user in row['mentioned_users']:
-        text = text.replace(f'//@{mentioned_user}', '')
-        text = text.replace(f'@{mentioned_user}', '')
-        text = text.replace(f'回复@{mentioned_user}:', '')
-    text = text.lower()
-    #remove english punctuation
-    text = text.translate(str.maketrans(string.punctuation, ' ' * len(string.punctuation)))
-    #remove chinese punctuation
-    punc = "！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.¥"
-    text = text.translate(str.maketrans(punc, ' ' * len(punc)))
-    # replace keywords with X
-    for keyword in keyword_dict[firm_name]:
-        text = text.replace(keyword.lower(), 'X')
-    text = re.sub(r'\d+', ' ', text)
-    text = re.sub(r'\s+', ' ', text)
-    #remove emoji
-    text = text.encode('gbk', 'ignore').decode('gbk')
-    row["text"] = text
-    return row
-
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--firm_name', type=str)
@@ -70,6 +48,4 @@ if __name__ == "__main__":
     df["topics"] = df["topics"].apply(getTopics)
     df["mentioned_users"] = df["mentioned_users"].apply(getMentionedUsers)
     df["labels"] = df["text"].apply(getLabels)
-    partial_preprocess = partial(preprocess, firm_name=firm_name)
-    df['cleaned_text'] = df.apply(partial_preprocess, axis=1)["text"]
     df.to_csv(f"./data/{firm_name}20220701-20230630_cleaned.csv", index=False)

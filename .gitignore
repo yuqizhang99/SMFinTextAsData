@@ -4,3 +4,4 @@ weibo-search/*
 data_cleaning.ipynb
 model/*
 stopwords/*
+*.png
